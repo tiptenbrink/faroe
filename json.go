@@ -1,0 +1,3 @@
+package faroe
+
+const emptyObjectJSON = "{}"

@@ -1,0 +1,4 @@
+github.com/faroedev/go-json v0.1.1 h1:PfYNgKpxELrtC66UFj0P1zaoV4wK9AejD1UyBcEHcP4=
+github.com/faroedev/go-json v0.1.1/go.mod h1:xDXcDdefPzXVQCk9Zx+MecgvYCSkmLm6LxiXsn7vA+c=
+golang.org/x/sync v0.16.0 h1:ycBJEhp9p4vXvUZNszeOq0kGTPghopOL8q0fq3vstxw=
+golang.org/x/sync v0.16.0/go.mod h1:1dzgHSNfp02xaA81J2MS99Qcpr2w7fw1gpm99rleRqA=
