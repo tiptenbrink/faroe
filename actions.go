@@ -2387,6 +2387,6 @@ type ActionErrorLoggerInterface interface {
 type ActionInvocationEndpointClientInterface interface {
 	// Sends a request to an action invocation endpoint with the request body.
 	// Returns the string body of a 200 response.
-	// An error is returned if a 200 response could be received (after one or several attempts).
+	// An error is returned if a 200 response could not be received (after one or several attempts).
 	SendActionInvocationEndpointRequest(body string) (string, error)
 }
