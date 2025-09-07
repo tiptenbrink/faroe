@@ -2357,14 +2357,17 @@ type EmailSenderInterface interface {
 
 	// Send an email to emailAddress.
 	// displayName may be an empty string.
+	// timestamp is when the user signed in.
 	SendUserSignedInNotification(emailAddress string, displayName string, timestamp time.Time) error
 
 	// Send an email to emailAddress.
 	// displayName may be an empty string.
+	// timestamp is when the email address was updated.
 	SendUserEmailAddressUpdatedNotification(emailAddress string, displayName string, newEmailAddress string, timestamp time.Time) error
 
 	// Send an email to emailAddress.
 	// displayName may be an empty string.
+	// timestamp is when the password was updated.
 	SendUserPasswordUpdatedNotification(emailAddress string, displayName string, timestamp time.Time) error
 }
 
