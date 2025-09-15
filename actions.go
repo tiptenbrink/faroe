@@ -375,10 +375,13 @@ func (server *ServerStruct) completeSignupAction(actionInvocationId string, sign
 		errorCodePasswordNotSet          = "password_not_set"
 	)
 
+	server.errorLogger.LogActionError(time.Now(), "validating signup token", actionInvocationId, "complete_signup")
+
 	signup, err := server.validateSignupToken(signupToken)
 	if err != nil && errors.Is(err, errInvalidSignupToken) {
 		return actionSessionStruct{}, "", newActionError(errorCodeInvalidSignupToken)
 	}
+
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to validate signup token: %s", err.Error())
 		server.errorLogger.LogActionError(server.clock.Now(), errorMessage, actionInvocationId, ActionCompleteSignup)
@@ -392,6 +395,7 @@ func (server *ServerStruct) completeSignupAction(actionInvocationId string, sign
 		return actionSessionStruct{}, "", newActionError(errorCodePasswordNotSet)
 	}
 
+	server.errorLogger.LogActionError(time.Now(), "email verified and password set, checking email", actionInvocationId, "complete_signup")
 	emailAddressAllowed, err := server.newEmailAddressChecker.CheckEmailAddress(signup.emailAddress)
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to check email address: %s", err.Error())
@@ -409,6 +413,7 @@ func (server *ServerStruct) completeSignupAction(actionInvocationId string, sign
 		return actionSessionStruct{}, "", newActionError(errorCodeInvalidSignupToken)
 	}
 
+	server.errorLogger.LogActionError(time.Now(), "creating user", actionInvocationId, "complete_signup")
 	user, err := server.userStore.CreateUser(signup.emailAddress, signup.passwordHash, signup.passwordHashAlgorithmId, signup.passwordSalt)
 	if err != nil && errors.Is(err, ErrUserStoreUserNotFound) {
 		return actionSessionStruct{}, "", newActionError(errorCodeInternalConflict)
@@ -419,6 +424,8 @@ func (server *ServerStruct) completeSignupAction(actionInvocationId string, sign
 			errorMessage := fmt.Sprintf("failed to delete signup: %s", err.Error())
 			server.errorLogger.LogActionError(server.clock.Now(), errorMessage, actionInvocationId, ActionCompleteSignup)
 		}
+
+		server.errorLogger.LogActionError(time.Now(), "email address already used", actionInvocationId, "complete_signup")
 
 		return actionSessionStruct{}, "", newActionError(errorCodeInvalidSignupToken)
 	}
@@ -435,6 +442,8 @@ func (server *ServerStruct) completeSignupAction(actionInvocationId string, sign
 		server.errorLogger.LogActionError(server.clock.Now(), errorMessage, actionInvocationId, ActionCompleteSignup)
 	}
 
+	server.errorLogger.LogActionError(time.Now(), "creating session", actionInvocationId, "complete_signup")
+
 	session, sessionToken, err := server.createSession(user.Id, user.DisabledCounter, user.SessionsCounter)
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to create session: %s", err.Error())
@@ -442,6 +451,8 @@ func (server *ServerStruct) completeSignupAction(actionInvocationId string, sign
 
 		return actionSessionStruct{}, "", newActionError(errorCodeSessionNotCreated)
 	}
+
+	server.errorLogger.LogActionError(time.Now(), "send sign in notif", actionInvocationId, "complete_signup")
 
 	err = server.emailSender.SendUserSignedInNotification(user.EmailAddress, user.DisplayName, session.createdAt)
 	if err != nil {

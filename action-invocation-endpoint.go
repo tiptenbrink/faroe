@@ -3,6 +3,7 @@ package faroe
 import (
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/faroedev/go-json"
 )
@@ -320,6 +321,8 @@ func (server *ServerStruct) invokeCompleteSignupAction(argumentsJSONObject json.
 
 	actionInvocationId := generateRandomId()
 
+	server.errorLogger.LogActionError(time.Now(), "invoking complete signup", actionInvocationId, "complete_signup")
+
 	session, sessionToken, err := server.completeSignupAction(actionInvocationId, signupToken)
 	if err != nil {
 		actionErr := err.(*actionErrorStruct)
@@ -327,6 +330,8 @@ func (server *ServerStruct) invokeCompleteSignupAction(argumentsJSONObject json.
 		resultJSON := createActionInvocationEndpointActionErrorResultJSON(actionInvocationId, actionErr.errorCode)
 		return resultJSON, nil
 	}
+
+	server.errorLogger.LogActionError(time.Now(), "encoding session", actionInvocationId, "complete_signup")
 
 	sessionJSON := server.encodeSessionToJSON(session)
 
